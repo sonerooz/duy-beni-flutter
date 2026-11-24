@@ -1,0 +1,21 @@
+docs/gizlilik.html
+  s_49951ae8cce64e::t_dc42bc0fe939b3 1-15
+docs/index.html
+  s_49951ae8cce64e::t_1d2bafc30a23ff 1-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "607f771d53eb0617bd82c90632d37518c809b698",
+  "prompts": {},
+  "sessions": {
+    "s_49951ae8cce64e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4010cf0-ed29-4a28-b6d9-ed797b631e5c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Soner ÖZ <soner.oz@turkcell.com.tr>"
+    }
+  }
+}
