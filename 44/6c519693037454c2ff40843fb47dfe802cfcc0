@@ -1,0 +1,59 @@
+test/data_test.dart
+  s_49951ae8cce64e::t_5bc74975b6890d 88-113,166-185,192
+pubspec.yaml
+  s_49951ae8cce64e::t_4589644fedfa5c 19
+lib/ui/ready.dart
+  s_49951ae8cce64e::t_0076b14855f2c7 103
+lib/ui/results.dart
+  s_49951ae8cce64e::t_0076b14855f2c7 14-17,25-26,32,60,62,70-72,106,118-119
+ios/Runner/Info.plist
+  s_49951ae8cce64e::t_463443bafbba79 27-28,58-59
+lib/ui/common.dart
+  s_49951ae8cce64e::t_0076b14855f2c7 22-24,106-108,126,141-142,144-149
+  s_49951ae8cce64e::t_4c87f01948a62a 21
+ios/Runner.xcodeproj/project.pbxproj
+  s_49951ae8cce64e::t_78fe1cf8a49384 368,496,550
+  s_49951ae8cce64e::t_463443bafbba79 386,568,591
+lib/l10n.dart
+  s_49951ae8cce64e::t_ffa13c4ad45f9c 17,35-38,58,76-79,99,117-120
+lib/game_state.dart
+  s_49951ae8cce64e::t_0d779417b33461 33-35,93-94,99,108,111,147,153,159,164
+lib/ui/settings.dart
+  s_49951ae8cce64e::t_0076b14855f2c7 68
+test/screens_test.dart
+  s_49951ae8cce64e::t_5bc74975b6890d 11,79-80,200-214,220-246
+  s_49951ae8cce64e::t_4589644fedfa5c 81-86,88
+  s_49951ae8cce64e::t_78c36de1411475 215-219
+  s_49951ae8cce64e::t_9321e0f1182acb 247
+lib/data.dart
+  s_49951ae8cce64e::t_0d779417b33461 108-109,112,115-117,143-150,152,154-160,163-173
+lib/ui/round_result.dart
+  s_49951ae8cce64e::t_0076b14855f2c7 44
+lib/ui/menu.dart
+  s_49951ae8cce64e::t_4589644fedfa5c 12-17,26,51-54,69-70,80-81
+  s_49951ae8cce64e::t_ffa13c4ad45f9c 1,31-32,34,39,48-50,55-63,71-79,82-91
+  s_49951ae8cce64e::t_8b859504fc5b35 92-93
+lib/ui/game_screen.dart
+  s_49951ae8cce64e::t_ffa13c4ad45f9c 36,83,127,133,139,158,164-168,304,310-341,344
+  s_49951ae8cce64e::t_ad1a053f386567 342-343,345
+README.md
+  s_49951ae8cce64e::t_3c7ca52c16fbd6 3
+docs/index.html
+  s_49951ae8cce64e::t_d72ccae289ae16 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "446c519693037454c2ff40843fb47dfe802cfcc0",
+  "prompts": {},
+  "sessions": {
+    "s_49951ae8cce64e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4010cf0-ed29-4a28-b6d9-ed797b631e5c",
+        "model": "claude-fable-5-2"
+      },
+      "human_author": "Soner ÖZ <soner.oz@turkcell.com.tr>"
+    }
+  }
+}
