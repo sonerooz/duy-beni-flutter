@@ -11,7 +11,10 @@ import 'ready.dart';
 ///  - Maç sürüyorsa: ara skorlar ve "SIRADAKİ TAKIM" düğmesi.
 ///  - Maç bittiyse (ya da Ayarlar'daki oyun geçmişinden açıldıysa): kazanan ve "YENİ OYUN".
 class ResultsScreen extends StatefulWidget {
-  const ResultsScreen({super.key});
+  const ResultsScreen({super.key, this.history = false});
+
+  /// Ayarlar'daki "Oyun Geçmişi": diske kaydedilmiş son maçı gösterir.
+  final bool history;
 
   @override
   State<ResultsScreen> createState() => _ResultsScreenState();
@@ -19,13 +22,14 @@ class ResultsScreen extends StatefulWidget {
 
 class _ResultsScreenState extends State<ResultsScreen> with SingleTickerProviderStateMixin {
   final game = Game.instance;
-  late final bool _ongoing = game.hasNextTeam;
+  late final bool _ongoing = !widget.history && game.hasNextTeam;
+  late final Map<int, TeamResult> _data = widget.history ? game.history : game.results;
   late final AnimationController _pop = AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
 
   @override
   void initState() {
     super.initState();
-    if (!_ongoing && game.results.isNotEmpty) {
+    if (!_ongoing && _data.isNotEmpty) {
       _pop.forward();
       Sfx.vibrate(200);
       game.running = false;
@@ -53,9 +57,9 @@ class _ResultsScreenState extends State<ResultsScreen> with SingleTickerProvider
   }
 
   String _winnerText() {
-    final r = game.results;
+    final r = _data;
     if (r.length == 1) return '${tr('score')}: ${r.values.first.correct}';
-    final win = game.winners();
+    final win = game.winners(r);
     if (win.length == 1) return '${tr('winner')}\n${tr('team')} ${win.first}';
     return '${tr('draw')}\n${tr('team')} ${win.join(' & ')}';
   }
@@ -63,9 +67,9 @@ class _ResultsScreenState extends State<ResultsScreen> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     final w = sw(context), h = sh(context);
-    final done = !_ongoing && game.results.isNotEmpty;
-    final winners = done ? game.winners() : const <int>[];
-    final teams = game.results.keys.toList()..sort();
+    final done = !_ongoing && _data.isNotEmpty;
+    final winners = done ? game.winners(_data) : const <int>[];
+    final teams = _data.keys.toList()..sort();
 
     Widget cell(String text, double size, Color color, {int weight = 400}) =>
         Expanded(child: Center(child: Text(text, style: ts(w * size, weight: weight, color: color))));
@@ -99,7 +103,7 @@ class _ResultsScreenState extends State<ResultsScreen> with SingleTickerProvider
                     padding: EdgeInsets.symmetric(vertical: w * 0.012),
                     child: Row(
                       children: () {
-                        final win = winners.contains(t) && game.results.length > 1;
+                        final win = winners.contains(t) && _data.length > 1;
                         final c = win ? kRed : kInk;
                         return [
                           Expanded(
@@ -111,8 +115,8 @@ class _ResultsScreenState extends State<ResultsScreen> with SingleTickerProvider
                               ],
                             ),
                           ),
-                          cell('${game.results[t]!.correct}', 0.055, c, weight: 500),
-                          cell('${game.results[t]!.pass}', 0.055, c, weight: 500),
+                          cell('${_data[t]!.correct}', 0.055, c, weight: 500),
+                          cell('${_data[t]!.pass}', 0.055, c, weight: 500),
                         ];
                       }(),
                     ),

@@ -85,6 +85,32 @@ void main() {
       expect(deck.next(p, lists, 'KOLAY'), isNotNull);
     });
 
+    test('paket maç ortasında bitse de bir takımın kelimesi diğer takıma gelmez', () async {
+      // Z Kuşağı 210 kelime. Önceki maçlarda 150 kelime çıkmış olsun; yeni maçta iki takım
+      // 50şer kelime görsün. Paket ikinci takımın turunda biter ve deste baştan başlar.
+      final p = packs.firstWhere((x) => x.id == 'zkusagi');
+      final lists = await PackData.levelLists(p);
+      final d = Deck();
+      for (var i = 0; i < 150; i++) {
+        d.next(p, lists, 'ZOR');
+      }
+      d.startMatch();
+      final t1 = {for (var i = 0; i < 50; i++) d.next(p, lists, 'ZOR')!};
+      final t2 = {for (var i = 0; i < 50; i++) d.next(p, lists, 'ZOR')!};
+      expect(t1.length, 50);
+      expect(t2.length, 50);
+      expect(t1.intersection(t2), isEmpty, reason: 'ikinci takıma birinci takımın kelimesi geldi');
+    });
+
+    test('tek maçta paketin tamamı çıkarsa deste yine de kelime verir', () async {
+      final p = packs.firstWhere((x) => x.id == 'zkusagi');
+      final lists = await PackData.levelLists(p);
+      final d = Deck()..startMatch();
+      for (var i = 0; i < 500; i++) {
+        expect(d.next(p, lists, 'ZOR'), isNotNull);
+      }
+    });
+
     test('boş paket null döner, çökmez', () {
       expect(Deck().next(const Pack('x', 'X', 'TR'), {}, 'ORTA'), isNull);
     });
@@ -137,15 +163,33 @@ void main() {
       expect(g.duration, 90);
       expect(g.level, 'ZOR');
       expect(g.teams, 3);
-      expect(g.results[1]!.correct, 6);
-      expect(g.results[1]!.pass, 1);
+      expect(g.history[1]!.correct, 6);
+      expect(g.history[1]!.pass, 1);
+    });
+
+    test('yeni maç başlatıp tur oynamadan kapatınca geçmiş silinmez', () async {
+      final g = Game.instance;
+      g.lastCorrect = 4;
+      g.lastPass = 2;
+      g.recordRound();
+      g.startSeries(); // OYUNA BAŞLA / YENİ OYUN, sonra tur bitmeden uygulama kapanıyor
+      final prefs = await SharedPreferences.getInstance();
+      await g.init(prefs: prefs);
+      expect(g.history[1]!.correct, 4, reason: 'önceki maç geçmişte kalmalı');
+      expect(g.history[1]!.pass, 2);
+      // Yeni maçın ilk turu bitince geçmiş yeni maça döner.
+      g.lastCorrect = 9;
+      g.lastPass = 0;
+      g.recordRound();
+      await g.init(prefs: prefs);
+      expect(g.history[1]!.correct, 9);
     });
 
     test('bozuk kayıt çökertmez', () async {
       SharedPreferences.setMockInitialValues({'history': 'bozuk{', 'pack': 99, 'duration': 7, 'teams': 40});
       final g = Game.instance;
       await g.init();
-      expect(g.results, isEmpty);
+      expect(g.history, isEmpty);
       expect(g.packIndex, packs.length - 1);
       expect(Game.durations, contains(g.duration));
       expect(g.teams, Game.maxTeams);

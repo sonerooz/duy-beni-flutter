@@ -41,7 +41,7 @@ class _RoundResultScreenState extends State<RoundResultScreen> {
           Positioned(top: h * 0.6, left: 0, right: 0, child: Center(child: label(tr('pass')))),
           Positioned(top: h * 0.665, left: 0, right: 0, child: Center(child: number(game.lastPass))),
           Positioned(
-            top: h * 0.84,
+            top: h * 0.78,
             left: 0,
             right: 0,
             child: Center(child: DuyButton(width: w * 0.48, height: w * 0.16, fontSize: w * 0.056, text: tr('continue'), onTap: _next)),

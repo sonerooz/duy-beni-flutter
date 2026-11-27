@@ -65,7 +65,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           row(tr('difficulty'), levelName(game.level), () => setState(game.cycleLevel)),
           wide(tr('history'), () {
             game.running = false;
-            go(context, const ResultsScreen());
+            go(context, const ResultsScreen(history: true));
           }),
           wide(tr('howTo'), () => go(context, const HowToScreen())),
         ],

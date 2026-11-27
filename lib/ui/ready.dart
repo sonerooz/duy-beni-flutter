@@ -100,7 +100,7 @@ class _ReadyScreenState extends State<ReadyScreen> with SingleTickerProviderStat
           ),
           if (!_counting)
             Positioned(
-              top: h * 0.84,
+              top: h * 0.76,
               left: 0,
               right: 0,
               child: Center(child: DuyButton(width: w * 0.48, height: w * 0.16, fontSize: w * 0.056, text: tr('start'), onTap: _start)),

@@ -18,7 +18,10 @@ const _bgColors = [Color(0xFFE2AD0F), Color(0xFFE2AD0F), Color(0xFFFFD209), Colo
 const _bgStops = [0.0, 0.2664609, 0.5483539, 0.968107, 1.0];
 
 double sw(BuildContext c) => MediaQuery.sizeOf(c).width;
-double sh(BuildContext c) => MediaQuery.sizeOf(c).height;
+
+/// Ekranın kullanılabilir yüksekliği: çentik ve alt çubuk payları düşülür. Yerleşimler
+/// SafeArea içinde bu yüksekliğe göre yapılır; yoksa alttaki düğmeler ekranın dışına taşar.
+double sh(BuildContext c) => MediaQuery.sizeOf(c).height - MediaQuery.paddingOf(c).vertical;
 
 TextStyle ts(double size, {int weight = 400, Color color = kInk, double? height}) => TextStyle(
       fontFamily: 'OpenSans',
@@ -100,7 +103,9 @@ class Logo extends StatelessWidget {
   Widget build(BuildContext context) => Image.asset('assets/images/logo.png', width: width, filterQuality: FilterQuality.medium);
 }
 
-/// Amber yuvarlak düğme: basınca %15 büyür, gölgesi vardır.
+/// Amber yuvarlak düğme. Eski Godot sürümündeki kabarık görünüm: düğmenin altında koyu altın
+/// rengi belirgin bir gölge bandı (BUTONSTYL: gölge 30 px, kayma 25 px; basılıyken 50 / 30 px
+/// ve köşe 25 px; ölçüler 1290 px genişlikteki tasarıma göre). Basınca %15 büyür.
 class DuyButton extends StatefulWidget {
   const DuyButton({super.key, required this.width, required this.height, required this.onTap, this.text, this.fontSize, this.child});
   final double width, height;
@@ -118,6 +123,7 @@ class _DuyButtonState extends State<DuyButton> {
 
   @override
   Widget build(BuildContext context) {
+    final u = sw(context) / 1290; // Godot tasarımındaki 1 px
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTapDown: (_) => setState(() => _down = true),
@@ -132,10 +138,15 @@ class _DuyButtonState extends State<DuyButton> {
           height: widget.height,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: kAmber,
-            borderRadius: BorderRadius.circular(widget.height * 0.16),
+            color: _down ? const Color(0xDAFFB600) : kAmber,
+            borderRadius: BorderRadius.circular(math.min(widget.height * 0.16, u * (_down ? 25 : 40))),
             boxShadow: [
-              BoxShadow(color: const Color(0xB8AC7F1E), blurRadius: widget.height * 0.2, offset: Offset(0, widget.height * 0.13)),
+              BoxShadow(
+                color: _down ? const Color(0xB7815E12) : const Color(0xB7AC7F1E),
+                offset: Offset(0, u * (_down ? 30 : 25)),
+                spreadRadius: u * (_down ? 25 : 15),
+                blurRadius: u * (_down ? 30 : 18),
+              ),
             ],
           ),
           child: widget.child ??

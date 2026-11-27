@@ -105,10 +105,15 @@ class PackData {
 
 /// Tekrarsız kelime destesi. Uygulama açık kaldığı sürece çıkan kelime bir daha gelmez
 /// (zorluk ya da paket değişse de). Seçili düzey biterse yakın düzeyden verilir;
-/// paketteki tüm kelimeler biterse o paket için baştan başlanır.
+/// paketteki tüm kelimeler biterse o paket için baştan başlanır, ama o maçta çıkmış
+/// kelimeler mümkün olduğunca geri verilmez: bir takımın kelimesi diğer takıma gelmesin.
 class Deck {
   final Set<String> _used = {};
+  final Set<String> _match = {};
   final Map<String, List<String>> _decks = {};
+
+  /// Yeni maç: "bu maçta çıkanlar" listesi sıfırlanır.
+  void startMatch() => _match.clear();
 
   static String _key(Pack p, String level) => '${p.id}:$level';
 
@@ -135,22 +140,36 @@ class Deck {
       final j = i + f;
       if (i >= 0 && j >= 0 && j < levels.length) order.add(levels[j]);
     }
-    for (final lv in order) {
-      final w = _pull(p, lists, lv);
-      if (w != null) {
-        _used.add(w);
-        return w;
+    String? pullAny() {
+      for (final lv in order) {
+        final w = _pull(p, lists, lv);
+        if (w != null) {
+          _used.add(w);
+          _match.add(w);
+          return w;
+        }
+      }
+      return null;
+    }
+
+    void reset({required bool keepMatch}) {
+      for (final lv in levels) {
+        for (final w in lists[lv] ?? const <String>[]) {
+          if (!keepMatch || !_match.contains(w)) _used.remove(w);
+        }
+        _decks.remove(_key(p, lv));
       }
     }
-    // Bu paketin bütün kelimeleri kullanıldı: bu paket için baştan başla.
-    for (final lv in levels) {
-      for (final w in lists[lv] ?? const <String>[]) {
-        _used.remove(w);
-      }
-      _decks.remove(_key(p, lv));
-    }
-    final w = _pull(p, lists, level);
-    if (w != null) _used.add(w);
-    return w;
+
+    final w = pullAny();
+    if (w != null) return w;
+    // Bu paketin bütün kelimeleri kullanıldı: bu maçta çıkmamış olanlarla baştan başla.
+    reset(keepMatch: true);
+    final again = pullAny();
+    if (again != null) return again;
+    // Paketin tamamı bu maçta çıktı: artık tekrar kaçınılmaz.
+    _match.clear();
+    reset(keepMatch: false);
+    return pullAny();
   }
 }

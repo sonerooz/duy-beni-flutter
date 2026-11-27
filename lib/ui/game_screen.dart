@@ -33,6 +33,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin, 
   String _word = '';
   bool _over = false;
   bool _popup = false;
+  bool _quitAsk = false;
   String _popupText = '';
   Timer? _timer;
   bool _inBackground = false;
@@ -79,7 +80,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin, 
   // ------------------------------------------------------------ süre
 
   void _tick() {
-    if (_over || _popup || _inBackground || !mounted) return;
+    if (_over || _popup || _quitAsk || _inBackground || !mounted) return;
     setState(() => _remaining = math.max(0, _remaining - 1));
     if (_remaining > 0) _lastSeconds();
     if (_remaining <= 0) _timeUp();
@@ -123,19 +124,19 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin, 
   // ------------------------------------------------------------ düğmeler
 
   void _correct() {
-    if (_over || _remaining <= 0) return;
+    if (_over || _quitAsk || _remaining <= 0) return;
     game.lastCorrect++;
     _nextWord();
   }
 
   void _pass() {
-    if (_over || _remaining <= 0) return;
+    if (_over || _quitAsk || _remaining <= 0) return;
     game.lastPass++;
     _nextWord();
   }
 
   Future<void> _openMeaning() async {
-    if (_word.isEmpty || _word == '?' || _over) return;
+    if (_word.isEmpty || _word == '?' || _over || _quitAsk) return;
     setState(() {
       _popup = true;
       _popupText = '…';
@@ -154,11 +155,17 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin, 
 
   void _closeMeaning() => setState(() => _popup = false);
 
+  /// Geri: önce açık pencereyi kapatır; yoksa çıkmadan önce sorar. Soru açıkken süre durur.
   void _back() {
     if (_popup) {
       _closeMeaning();
       return;
     }
+    if (_over) return;
+    setState(() => _quitAsk = !_quitAsk);
+  }
+
+  void _quit() {
     _timer?.cancel();
     game.running = false;
     go(context, const MenuScreen());
@@ -294,7 +301,44 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin, 
               ),
             ),
           if (_popup) _meaningPanel(w, h),
+          if (_quitAsk && !_over) _quitPanel(w),
         ],
+      ),
+    );
+  }
+
+  Widget _quitPanel(double w) {
+    return Positioned.fill(
+      child: GestureDetector(
+        onTap: () => setState(() => _quitAsk = false),
+        child: ColoredBox(
+          color: const Color(0x99000000),
+          child: Center(
+            child: GestureDetector(
+              onTap: () {},
+              child: Container(
+                width: w * 0.8,
+                padding: EdgeInsets.fromLTRB(w * 0.06, w * 0.08, w * 0.06, w * 0.09),
+                decoration: BoxDecoration(color: kAmber, borderRadius: BorderRadius.circular(w * 0.06)),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(tr('quitAsk'), textAlign: TextAlign.center, style: ts(w * 0.06, weight: 500, height: 1.2)),
+                    SizedBox(height: w * 0.08),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        DuyButton(width: w * 0.28, height: w * 0.14, fontSize: w * 0.05, text: tr('no'), onTap: () => setState(() => _quitAsk = false)),
+                        SizedBox(width: w * 0.07),
+                        DuyButton(width: w * 0.28, height: w * 0.14, fontSize: w * 0.05, text: tr('yes'), onTap: _quit),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

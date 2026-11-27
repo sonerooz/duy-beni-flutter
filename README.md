@@ -1,6 +1,6 @@
 # Duy Beni
 
-Takım arkadaşına ekrandaki kelimeyi, kelimenin kendisini söylemeden anlat. Bilirse **DOĞRU**'ya, bilemezse **PAS**'a bas. Süre bitmeden en çok puanı topla.
+Tahmin eden oyuncu kulaklığını takıp müziğin sesini açar. Anlatıcı ekrandaki kelimeyi yüksek sesle söyler; arkadaşı onu duymadan, dudaklarını okuyarak kelimeyi bulmaya çalışır. Bilirse **DOĞRU**'ya, bilemezse **PAS**'a bas. Süre bitmeden en çok puanı topla.
 
 Flutter ile yazılmış, Android ve iOS için tek kod tabanı. Paket adı: `com.soneroz.duybeni`. Önceki Godot sürümü: [sonerooz/duy-beni](https://github.com/sonerooz/duy-beni).
 

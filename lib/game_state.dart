@@ -30,6 +30,9 @@ class Game {
   int currentTeam = 1;
   bool running = false;
   Map<int, TeamResult> results = {};
+
+  /// Oyun geçmişi: en az bir turu oynanmış son maçın sonuçları (diske kaydedilir).
+  Map<int, TeamResult> history = {};
   int lastCorrect = 0, lastPass = 0;
   final Deck deck = Deck();
 
@@ -87,11 +90,13 @@ class Game {
     lastCorrect = 0;
     lastPass = 0;
     running = true;
-    _saveHistory();
+    deck.startMatch();
+    // Geçmişe dokunulmaz: yeni maçın ilk turu bitene kadar önceki maç geçmişte kalır.
   }
 
   void recordRound() {
     results[currentTeam] = TeamResult(lastCorrect, lastPass);
+    history = Map.of(results);
     _saveHistory();
   }
 
@@ -100,10 +105,10 @@ class Game {
 
   /// Kazananlar: en çok doğru; eşitlikte daha az pas yapan önde.
   /// Birden fazla takım dönerse berabere demektir.
-  List<int> winners() {
+  List<int> winners([Map<int, TeamResult>? of]) {
     var best = <int>[];
     var bestC = -1, bestP = 0;
-    for (final e in results.entries) {
+    for (final e in (of ?? results).entries) {
       final c = e.value.correct, p = e.value.pass;
       if (c > bestC || (c == bestC && p < bestP)) {
         best = [e.key];
@@ -139,23 +144,24 @@ class Game {
       jsonEncode({
         'v': 2,
         'teams': teams,
-        'results': {for (final e in results.entries) '${e.key}': {'c': e.value.correct, 'p': e.value.pass}},
+        'results': {for (final e in history.entries) '${e.key}': {'c': e.value.correct, 'p': e.value.pass}},
       }),
     );
   }
 
   void _loadHistory() {
+    history = {};
     final raw = _prefs?.getString('history');
     if (raw == null) return;
     try {
       final m = jsonDecode(raw) as Map<String, dynamic>;
       if (m['v'] != 2) return;
-      results = {
+      history = {
         for (final e in (m['results'] as Map<String, dynamic>).entries)
           int.parse(e.key): TeamResult((e.value['c'] as num).toInt(), (e.value['p'] as num).toInt()),
       };
     } catch (_) {
-      results = {};
+      history = {};
     }
   }
 }

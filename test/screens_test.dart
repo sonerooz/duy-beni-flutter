@@ -8,6 +8,7 @@ import 'package:duybeni/data.dart';
 import 'package:duybeni/game_state.dart';
 import 'package:duybeni/l10n.dart';
 import 'package:duybeni/sfx.dart';
+import 'package:duybeni/ui/common.dart';
 import 'package:duybeni/ui/dictionary.dart';
 import 'package:duybeni/ui/game_screen.dart';
 import 'package:duybeni/ui/howto.dart';
@@ -75,11 +76,16 @@ void main() {
 
     // ---- açılış ve menü
     await show(const SplashScreen());
-    await tester.pump(const Duration(seconds: 2));
-    await shot('00_acilis');
-    await tester.pump(const Duration(seconds: 2));
+    await tester.pump(const Duration(milliseconds: 1000));
+    await shot('00_acilis_1sn');
+    await tester.pump(const Duration(milliseconds: 900));
+    await shot('00_acilis_1_9sn');
+    expect(find.byType(SplashScreen), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 200));
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(find.byType(MenuScreen), findsOneWidget, reason: 'büyüme bitince beklemeden ana menüye geçmeli');
     await tester.pumpAndSettle();
-    expect(find.text(tr('play')), findsOneWidget, reason: 'açılış 3 sn sonra ana menüye geçmeli');
+    expect(find.text(tr('play')), findsOneWidget, reason: 'açılıştan sonra ana menü gelmeli');
     await settle();
     await shot('01_ana_menu');
 
@@ -190,6 +196,54 @@ void main() {
     expect(find.text('59'), findsOneWidget);
     await tester.pump(const Duration(seconds: 5));
     expect(find.text('59'), findsOneWidget, reason: 'sözlük açıkken süre durmalı');
+
+    // ---- oyun içi geri tuşu: önce sorar, süre durur
+    await show(const GameScreen());
+    await tester.pump(const Duration(seconds: 1));
+    await tester.tap(find.text('<'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(find.text(tr('quitAsk')), findsOneWidget, reason: 'geri tuşu çıkmadan önce sormalı');
+    expect(find.byType(GameScreen), findsOneWidget);
+    await shot('16_cikis_onayi');
+    await tester.pump(const Duration(seconds: 5));
+    expect(find.text('59'), findsOneWidget, reason: 'çıkış sorusu açıkken süre durmalı');
+    final before = g.lastCorrect;
+    await tester.tap(find.text(tr('correct')), warnIfMissed: false);
+    await tester.pump();
+    expect(g.lastCorrect, before, reason: 'soru açıkken DOĞRU sayılmamalı');
+    // Pencerenin dışına dokunmak soruyu kapatır; yeniden aç ve HAYIR de.
+    if (find.text(tr('quitAsk')).evaluate().isEmpty) {
+      await tester.tap(find.text('<'));
+      await tester.pump();
+    }
+    await tester.tap(find.text(tr('no')));
+    await tester.pump();
+    expect(find.text(tr('quitAsk')), findsNothing);
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.text('58'), findsOneWidget, reason: 'HAYIR denince süre devam etmeli');
+    await tester.tap(find.text('<'));
+    await tester.pump();
+    await tester.tap(find.text(tr('yes')));
+    await tester.pumpAndSettle();
+    expect(find.byType(MenuScreen), findsOneWidget, reason: 'EVET denince ana menüye dönmeli');
+
+    // ---- çentikli telefon: alt düğmeler güvenli alanın içinde ve altında reklam payı kalmalı
+    tester.view.physicalSize = const Size(1290, 2796);
+    tester.view.devicePixelRatio = 3;
+    tester.view.padding = const FakeViewPadding(top: 177, bottom: 102);
+    g.startSeries();
+    for (final (name, screen, label) in [
+      ('17_hazir_iphone', const ReadyScreen() as Widget, tr('start')),
+      ('18_tur_sonucu_iphone', const RoundResultScreen() as Widget, tr('continue')),
+    ]) {
+      await show(screen);
+      final r = tester.getRect(find.ancestor(of: find.text(label), matching: find.byType(DuyButton)));
+      final safeBottom = (2796 - 102) / 3;
+      expect(r.bottom, lessThan(safeBottom - 60), reason: '$name: düğmenin altında en az 60 pt boşluk olmalı');
+      await shot(name);
+    }
+    tester.view.resetPadding();
 
     await tester.pumpWidget(const SizedBox());
   });
