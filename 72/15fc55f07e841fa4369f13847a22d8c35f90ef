@@ -1,0 +1,25 @@
+pubspec.yaml
+  s_49951ae8cce64e::t_090ede145a2f3c 19
+lib/ui/menu.dart
+  s_49951ae8cce64e::t_5a030b7417273a 101,105,116,118
+lib/ui/common.dart
+  s_49951ae8cce64e::t_090ede145a2f3c 103
+test/screens_test.dart
+  s_49951ae8cce64e::t_090ede145a2f3c 30,39,63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7215fc55f07e841fa4369f13847a22d8c35f90ef",
+  "prompts": {},
+  "sessions": {
+    "s_49951ae8cce64e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4010cf0-ed29-4a28-b6d9-ed797b631e5c",
+        "model": "claude-fable-5-2"
+      },
+      "human_author": "Soner ÖZ <soner.oz@turkcell.com.tr>"
+    }
+  }
+}
