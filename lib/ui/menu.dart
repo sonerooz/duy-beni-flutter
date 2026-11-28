@@ -98,11 +98,11 @@ class MenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final w = sw(context), h = sh(context);
-    Widget btn(String key, VoidCallback onTap) => DuyButton(width: w * 0.51, height: w * 0.158, fontSize: w * 0.053, text: tr(key), onTap: onTap);
+    Widget btn(String key, VoidCallback onTap) => DuyButton(width: w * 800 / 1290, height: w * 250 / 1290, fontSize: w * 80 / 1290, text: tr(key), onTap: onTap);
     return DuyPage(
       child: Stack(
         children: [
-          Positioned(top: h * 0.045, left: 0, right: 0, child: Center(child: Logo(width: w * 0.56))),
+          Positioned(top: h * 0.045, left: 0, right: 0, child: Center(child: Logo(width: w * 1098 / 1290))),
           Positioned(
             top: h * 0.43,
             left: 0,
@@ -113,9 +113,9 @@ class MenuScreen extends StatelessWidget {
                   Game.instance.startSeries();
                   go(context, const ReadyScreen());
                 }),
-                SizedBox(height: w * 0.08),
+                SizedBox(height: w * 125 / 1290),
                 btn('settings', () => go(context, const SettingsScreen())),
-                SizedBox(height: w * 0.08),
+                SizedBox(height: w * 125 / 1290),
                 btn('dictionary', () => go(context, const DictionaryScreen())),
               ],
             ),

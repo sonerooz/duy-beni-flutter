@@ -27,6 +27,7 @@ const outDir = String.fromEnvironment('OUT', defaultValue: 'build/shots');
 const packIndex = int.fromEnvironment('LANG', defaultValue: 0);
 const width = int.fromEnvironment('W', defaultValue: 1080);
 const height = int.fromEnvironment('H', defaultValue: 1920);
+const dpr = int.fromEnvironment('DPR', defaultValue: 1);
 
 void main() {
   final key = GlobalKey();
@@ -35,7 +36,7 @@ void main() {
   Future<void> shot(String name) async {
     final boundary = key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
     await t.runAsync(() async {
-      final img = await boundary.toImage();
+      final img = await boundary.toImage(pixelRatio: t.view.devicePixelRatio);
       final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
       File('$outDir/$name.png').writeAsBytesSync(bytes!.buffer.asUint8List());
     });
@@ -59,7 +60,7 @@ void main() {
   testWidgets('ekranlar', (tester) async {
     t = tester;
     tester.view.physicalSize = Size(width.toDouble(), height.toDouble());
-    tester.view.devicePixelRatio = 1;
+    tester.view.devicePixelRatio = dpr.toDouble();
     Directory(outDir).createSync(recursive: true);
     SharedPreferences.setMockInitialValues({});
     Sfx.enabled = false;

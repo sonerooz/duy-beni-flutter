@@ -100,7 +100,7 @@ class Logo extends StatelessWidget {
   final double width;
 
   @override
-  Widget build(BuildContext context) => Image.asset('assets/images/logo.png', width: width, filterQuality: FilterQuality.medium);
+  Widget build(BuildContext context) => Image.asset('assets/images/logo.png', width: width, fit: BoxFit.contain, filterQuality: FilterQuality.medium);
 }
 
 /// Amber yuvarlak düğme. Eski Godot sürümündeki kabarık görünüm: düğmenin altında koyu altın
